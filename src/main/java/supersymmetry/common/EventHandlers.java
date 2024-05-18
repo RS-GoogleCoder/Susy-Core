@@ -2,6 +2,7 @@ package supersymmetry.common;
 
 import com.alcatrazescapee.notreepunching.common.items.ItemCeramicBucket;
 import com.alcatrazescapee.notreepunching.common.items.ModItems;
+import com.shinoow.beneath.Beneath;
 import gregtech.api.util.GTTeleporter;
 import gregtech.api.util.TeleportHandler;
 import gregtech.common.items.MetaItems;
@@ -22,6 +23,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.event.DifficultyChangeEvent;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -43,6 +45,8 @@ import supersymmetry.common.event.MobHordeWorldData;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.shinoow.beneath.Beneath.*;
 
 @Mod.EventBusSubscriber(modid = Supersymmetry.MODID)
 public class EventHandlers {
@@ -152,5 +156,46 @@ public class EventHandlers {
             list.getPlayers().forEach(p -> mobHordeWorldData.getPlayerData(p.getPersistentID()).update(p));
             mobHordeWorldData.markDirty();
         }
+    }
+
+    @SubscribeEvent
+    public static void difficultyChangeEvent(DifficultyChangeEvent event) {
+        EnumDifficulty newDiff = event.getDifficulty();
+        if(newDiff == EnumDifficulty.PEACEFUL)
+        {
+            SusyLog.logger.info("New difficulty is peaceful!");
+            // If the difficulty is peaceful then disable all the scary features
+            // Mode
+            Beneath.mode = "none";
+
+            // Sound effects
+            Beneath.beneath_normal = null;
+            Beneath.beneath_drawnout = null;
+            Beneath.beneath_muffled = null;
+            Beneath.dark1 = null;
+            Beneath.dark2 = null;
+            Beneath.deepdank = null;
+            Beneath.scream = null;
+
+            // Shadows and Darkness
+            Beneath.shadowHand = false;
+            Beneath.darkDamage = 0;
+
+            Beneath.cfg.save();
+        }
+        else
+        {
+            SusyLog.logger.info("New difficulty is not peaceful!");
+
+            // If the difficulty is not peaceful then enable all the scary features
+            // Mode
+            Beneath.mode = "darkness";
+
+            Beneath.cfg.save();
+
+        }
+
+
+        SusyLog.logger.info("Beneath mode: " + Beneath.mode);
     }
 }
